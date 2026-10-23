@@ -8,6 +8,7 @@ const fs = require('fs');
 const path = require('path');
 const Database = require('better-sqlite3');
 const env = require('./env');
+const { hashPassword } = require('../utils/password');
 
 // Ensure the data directory exists.
 fs.mkdirSync(path.dirname(env.dbFile), { recursive: true });
