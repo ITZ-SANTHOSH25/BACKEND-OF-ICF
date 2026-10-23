@@ -23,8 +23,89 @@ function migrate() {
   db.exec(schema);
   return db;
 }
-
-// Apply schema immediately so any require() gets a ready database.
+// Apply schema immediately.
 migrate();
+
+// Create demo Hospital and Authority accounts if they do not exist.
+function seedDemoAccounts() {
+  const createHospital = db.transaction(() => {
+    const existing = db.prepare(
+      'SELECT user_id FROM hospitals WHERE reg_id = ?'
+    ).get('HOSP001');
+
+    if (!existing) {
+      const user = db.prepare(`
+        INSERT INTO users (role, name, email, password_hash, phone, location)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        'hospital',
+        'Demo Hospital',
+        'demo.hospital@icf.local',
+        hashPassword('Hospital@123'),
+        '',
+        ''
+      );
+
+      db.prepare(`
+        INSERT INTO hospitals
+        (user_id, name, reg_id, address, contact, email, doctor)
+        VALUES (?, ?, ?, ?, ?, ?, ?)
+      `).run(
+        user.lastInsertRowid,
+        'Demo Hospital',
+        'HOSP001',
+        '',
+        '',
+        'demo.hospital@icf.local',
+        ''
+      );
+
+      db.prepare(
+        'INSERT INTO settings (user_id) VALUES (?)'
+      ).run(user.lastInsertRowid);
+    }
+  });
+
+  const createAuthority = db.transaction(() => {
+    const existing = db.prepare(
+      'SELECT user_id FROM authorities WHERE authority_id = ?'
+    ).get('AUTH001');
+
+    if (!existing) {
+      const user = db.prepare(`
+        INSERT INTO users (role, name, email, password_hash, phone, location)
+        VALUES (?, ?, ?, ?, ?, ?)
+      `).run(
+        'authority',
+        'Demo Authority',
+        'demo.authority@icf.local',
+        hashPassword('Authority@123'),
+        '',
+        ''
+      );
+
+      db.prepare(`
+        INSERT INTO authorities
+        (user_id, name, authority_id, officer, email)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(
+        user.lastInsertRowid,
+        'Demo Authority',
+        'AUTH001',
+        'Demo Officer',
+        'demo.authority@icf.local'
+      );
+
+      db.prepare(
+        'INSERT INTO settings (user_id) VALUES (?)'
+      ).run(user.lastInsertRowid);
+    }
+  });
+
+  createHospital();
+  createAuthority();
+}
+
+seedDemoAccounts();
 
 module.exports = { db, migrate };
