@@ -1,0 +1,24 @@
+{
+  "name": "icf-child-crowdfunding-backend",
+  "version": "2.0.0",
+  "description": "MongoDB-backed API for the ICF Child Crowdfunding Platform",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": { "start": "node server.js", "dev": "node --watch server.js" },
+  "keywords": ["child-crowdfunding", "healthcare", "donation", "mongodb", "mongoose", "express"],
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^7.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.19.1",
+    "morgan": "^1.10.0",
+    "multer": "^2.4.0",
+    "nanoid": "^3.3.7"
+  },
+  "engines": { "node": "22.x", "npm": ">=10" }
+}
