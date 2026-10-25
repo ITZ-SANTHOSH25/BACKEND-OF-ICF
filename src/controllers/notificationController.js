@@ -1,0 +1,5 @@
+'use strict';const {Notification}=require('../models');const {uid}=require('../utils/helpers');const {mapNotification}=require('../utils/helpers');const ApiError=require('../utils/ApiError');
+async function notify(userId,title,detail=''){if(!userId)return;return Notification.create({id:uid('NTF'),user_id:userId,title,detail,is_read:false})}
+async function listNotifications(req,res){const rows=await Notification.find({user_id:req.user.id}).sort({created_at:-1}).limit(100).lean();res.json({success:true,data:{notifications:rows.map(mapNotification),unread:rows.filter(r=>!r.is_read).length}})}
+async function markRead(req,res){const row=await Notification.findOneAndUpdate({id:req.params.id,user_id:req.user.id},{is_read:true},{new:true}).lean();if(!row)throw ApiError.notFound('Notification not found.');res.json({success:true,data:{notification:mapNotification(row)}})}
+async function markAllRead(req,res){await Notification.updateMany({user_id:req.user.id},{is_read:true});res.json({success:true,data:{message:'All notifications marked as read.'}})}module.exports={notify,listNotifications,markRead,markAllRead};
