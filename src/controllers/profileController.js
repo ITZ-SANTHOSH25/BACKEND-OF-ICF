@@ -160,16 +160,19 @@ async function updateSettings(req, res) {
     }
   }
 
-  if (b.privacy !== undefined) {
-    if (
-      typeof b.privacy !== 'string' ||
-      !['public', 'private'].includes(b.privacy.toLowerCase())
-    ) {
-      throw new ApiError(400, 'Invalid privacy value');
-    }
+if (b.privacy !== undefined) {
+  const privacyValue = String(b.privacy).trim().toLowerCase();
 
-    set.privacy = b.privacy.toLowerCase();
+  if (['public', 'everyone', 'visible'].includes(privacyValue)) {
+    set.privacy = 'public';
+  } else if (
+    ['private', 'only me', 'hidden', 'restricted'].includes(privacyValue)
+  ) {
+    set.privacy = 'private';
+  } else {
+    set.privacy = 'public';
   }
+}
 
   const row = await Settings.findOneAndUpdate(
     { user_id: req.user.id },
